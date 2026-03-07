@@ -1,0 +1,63 @@
+@use './variables' as *;
+@use './mixins' as *;
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding-bottom: 10vh;
+    transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &.shortcuts-disabled {
+        transform: translateY(-8vh);
+    }
+}
+
+.logo-wrapper {
+    @include flex-center(12px);
+    margin-bottom: 24px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.greeting-text {
+    font-size: 40px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.greeting-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    margin-right: 12px;
+}
+
+.divider {
+    width: 1px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 0 8px;
+}
+
+.translate-link {
+    display: block;
+    margin: 5px 0 2px;
+    font-size: 11px;
+    color: var(--text-color);
+    opacity: 0.7;
+    text-decoration: none;
+    transition: color 0.2s ease, opacity 0.2s ease;
+
+    &:hover {
+        text-decoration: underline;
+        opacity: 1;
+        color: var(--link-color, var(--text-color));
+    }
+}

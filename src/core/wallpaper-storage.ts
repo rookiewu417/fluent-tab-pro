@@ -1,0 +1,86 @@
+const WALLPAPER_DB_NAME = 'FluentNewTabDB';
+const WALLPAPER_DB_VERSION = 1;
+const WALLPAPER_STORE_NAME = 'wallpapers';
+
+function openWallpaperDB(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(WALLPAPER_DB_NAME, WALLPAPER_DB_VERSION);
+
+        request.onupgradeneeded = (event) => {
+            const db = (event.target as IDBOpenDBRequest).result;
+            if (!db.objectStoreNames.contains(WALLPAPER_STORE_NAME)) {
+                db.createObjectStore(WALLPAPER_STORE_NAME);
+            }
+        };
+
+        request.onsuccess = (event) => resolve((event.target as IDBOpenDBRequest).result);
+        request.onerror = (event) => reject('Erro ao abrir banco de dados: ' + (event.target as IDBOpenDBRequest).error);
+    });
+}
+
+async function saveWallpaperToDB(blob: Blob, keyName: string = 'custom_wallpaper'): Promise<boolean> {
+    const db = await openWallpaperDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([WALLPAPER_STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(WALLPAPER_STORE_NAME);
+        const request = store.put(blob, keyName);
+
+        request.onsuccess = () => resolve(true);
+        request.onerror = () => reject('Erro ao salvar no DB');
+    });
+}
+
+async function getWallpaperFromDB(keyName: string = 'custom_wallpaper'): Promise<Blob | null> {
+    const db = await openWallpaperDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([WALLPAPER_STORE_NAME], 'readonly');
+        const store = transaction.objectStore(WALLPAPER_STORE_NAME);
+        const request = store.get(keyName);
+
+        request.onsuccess = (event) => resolve((event.target as IDBRequest<Blob | undefined>).result ?? null);
+        request.onerror = () => reject('Erro ao ler do DB');
+    });
+}
+
+function processWallpaperImage(file: File): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = (event) => {
+            const dataUrl = String((event.target as FileReader).result || '');
+
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                let width = img.width;
+                let height = img.height;
+                const maxWidth = 1920;
+
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                ctx?.drawImage(img, 0, 0, width, height);
+
+                const webpDataUrl = canvas.toDataURL('image/webp', 0.85);
+                try {
+                    localStorage.setItem('custom_wallpaper_base64', webpDataUrl);
+                } catch (e) {
+                    console.warn('LocalStorage size limit exceeded', e);
+                }
+
+                canvas.toBlob((blob) => {
+                    if (blob) resolve(blob);
+                    else reject('Blob conversion failed');
+                }, 'image/webp', 0.85);
+            };
+            img.onerror = () => reject('Image load error');
+            img.src = dataUrl;
+        };
+        reader.onerror = (error) => reject(error);
+    });
+}
