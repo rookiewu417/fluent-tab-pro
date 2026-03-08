@@ -43,25 +43,7 @@
         }
 
         .settings-label {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-color);
-            background: transparent;
-            padding: 0;
-            box-shadow: none;
-            max-width: 0;
-            opacity: 0;
-            overflow: hidden;
-            white-space: nowrap;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-
-        &:hover .settings-label {
-            max-width: 160px;
-            opacity: 1;
-            margin-left: 12px;
-            margin-right: 8px;
+            display: none;
         }
     }
 
@@ -70,13 +52,6 @@
             background: rgba($color-accent-contrast, 0.8);
             backdrop-filter: blur(8px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-            .settings-label {
-                max-width: 160px;
-                opacity: 1;
-                margin-left: 12px;
-                margin-right: 8px;
-            }
         }
     }
 }

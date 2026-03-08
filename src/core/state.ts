@@ -19,7 +19,7 @@ let reduceEffectsEnabled = savedReducedEffectsEnabled !== 'false';
 
 const CACHE_KEY = 'fluent_weather_cache';
 const CITY_KEY = 'fluent_city_data';
-const CACHE_DURATION = 3600000;
+const CACHE_DURATION = 1800000;
 
 let weatherEnabled = localStorage.getItem('weatherEnabled') === 'true';
 let weatherUnit = (localStorage.getItem('weatherUnit') || 'c') as WeatherUnit;

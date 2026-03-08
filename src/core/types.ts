@@ -44,12 +44,17 @@ interface CityData {
     lat: number;
     lon: number;
     country?: string;
+    adcode?: string;
 }
 
 interface WeatherCurrent {
     temperature: number;
     weathercode: number;
     is_day: number;
+    weatherDesc?: string;
+    humidity?: number;
+    windpower?: string;
+    winddirection?: string;
 }
 
 interface WeatherApiResponse {
@@ -65,6 +70,7 @@ interface GeocodingResult {
     admin1?: string;
     admin2?: string;
     admin3?: string;
+    admin4?: string;
 }
 
 interface GeocodingResponse {

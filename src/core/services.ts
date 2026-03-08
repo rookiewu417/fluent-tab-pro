@@ -124,66 +124,105 @@ function fetchSuggestionsFromService(query: string): Promise<string[]> {
         });
 }
 
-async function fetchCityData(query: string): Promise<CityData | null> {
-    const language = navigator.language.split('-')[0] || 'zh';
+async function fetchCityData(city: string, district?: string): Promise<CityData | null> {
+    const amapKey = '3da93931654d638d4f15aade26933563';
+    let searchQuery = city;
+    if (district) {
+        searchQuery = `${city}${district}`;
+    }
 
-    const normalizeText = (value: string): string => value
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .trim();
+    const url = `https://restapi.amap.com/v3/geocode/geo?address=${encodeURIComponent(searchQuery)}&key=${amapKey}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
 
-    const queryParts = query.split(',').map((part) => normalizeText(part)).filter(Boolean);
-    const primaryTerm = queryParts[0] || normalizeText(query);
-    const qualifiers = queryParts.slice(1);
+        if (data.status === '1' && data.geocodes && data.geocodes.length > 0) {
+            const geocode = data.geocodes[0];
+            const locationStr = geocode.location;
 
-    const scoreResult = (result: GeocodingResult): number => {
-        const name = normalizeText(result.name || '');
-        const country = normalizeText(result.country || '');
-        const countryCode = normalizeText(result.country_code || '');
-        const admin1 = normalizeText(result.admin1 || '');
-        const admin2 = normalizeText(result.admin2 || '');
-        const admin3 = normalizeText(result.admin3 || '');
-        const context = [country, countryCode, admin1, admin2, admin3].filter(Boolean);
+            if (!locationStr || typeof locationStr !== 'string') return null;
 
-        let score = 0;
+            const [lonStr, latStr] = locationStr.split(',');
+            const lon = parseFloat(lonStr);
+            const lat = parseFloat(latStr);
 
-        if (name === primaryTerm) score += 200;
-        else if (name.startsWith(primaryTerm)) score += 120;
-        else if (name.includes(primaryTerm)) score += 70;
+            let resDistrict = typeof geocode.district === 'string' ? geocode.district : '';
+            let resCity = typeof geocode.city === 'string' ? geocode.city : '';
+            let resProvince = typeof geocode.province === 'string' ? geocode.province : '';
 
-        qualifiers.forEach((qualifier) => {
-            if (context.some((part) => part === qualifier)) {
-                score += 90;
-            } else if (context.some((part) => part.includes(qualifier))) {
-                score += 45;
+            if (!resCity && resProvince.endsWith('市')) {
+                resCity = resProvince;
             }
-        });
 
-        if (qualifiers.length > 0 && score > 0) {
-            const matchesAllQualifiers = qualifiers.every((qualifier) => context.some((part) => part.includes(qualifier)));
-            if (matchesAllQualifiers) score += 40;
+            if (resCity.endsWith('市')) resCity = resCity.slice(0, -1);
+            if (resDistrict.endsWith('区') || resDistrict.endsWith('县')) resDistrict = resDistrict.slice(0, -1);
+
+            let displayName = '';
+            if (resDistrict && resCity && resDistrict !== resCity) {
+                const suffix = (typeof geocode.district === 'string' && geocode.district.endsWith('县')) ? '县' : '区';
+                displayName = `${resDistrict}${suffix}, ${resCity}`;
+            } else if (resCity) {
+                displayName = resCity;
+            } else if (resProvince) {
+                displayName = resProvince;
+            } else {
+                displayName = typeof geocode.formatted_address === 'string' ? geocode.formatted_address : searchQuery;
+            }
+
+            if (district && !displayName.includes(district)) {
+                let formattedDistrict = district;
+                const suffix = formattedDistrict.endsWith('县') ? '县' : '区';
+                if (formattedDistrict.endsWith('区') || formattedDistrict.endsWith('县')) {
+                    formattedDistrict = formattedDistrict.slice(0, -1);
+                }
+                displayName = `${formattedDistrict}${suffix}, ${resCity || resProvince || city}`;
+            }
+
+            let country = typeof geocode.country === 'string' ? geocode.country : 'CN';
+            if (country === '中国') country = 'cn';
+
+            const adcode = typeof geocode.adcode === 'string' ? geocode.adcode : '';
+
+            return { name: displayName, lat, lon, country, adcode };
         }
-
-        return score;
-    };
-
-    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=10&language=${encodeURIComponent(language)}&format=json`;
-    const response = await fetch(url);
-    const data = await response.json() as GeocodingResponse;
-
-    if (data.results && data.results.length > 0) {
-        const sorted = [...data.results].sort((a, b) => scoreResult(b) - scoreResult(a));
-        const result = sorted[0];
-        return { name: result.name, lat: result.latitude, lon: result.longitude, country: result.country };
+    } catch (error) {
+        console.error('AMap geocode failed', error);
     }
 
     return null;
 }
 
 async function fetchWeatherData(cityData: CityData): Promise<WeatherApiResponse | null> {
-    const { lat, lon } = cityData;
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-    const response = await fetch(url);
-    return await response.json() as WeatherApiResponse;
+    const amapKey = '3da93931654d638d4f15aade26933563';
+    if (!cityData.adcode) return null;
+
+    const url = `https://restapi.amap.com/v3/weather/weatherInfo?city=${cityData.adcode}&key=${amapKey}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.status === '1' && data.lives && data.lives.length > 0) {
+            const live = data.lives[0];
+            const temp = parseFloat(live.temperature);
+            const humidity = parseFloat(live.humidity);
+
+            const hour = new Date().getHours();
+            const isDay = (hour >= 6 && hour < 18) ? 1 : 0;
+
+            return {
+                current_weather: {
+                    temperature: temp,
+                    weathercode: -1,
+                    is_day: isDay,
+                    weatherDesc: live.weather,
+                    humidity: humidity,
+                    windpower: live.windpower,
+                    winddirection: live.winddirection
+                }
+            };
+        }
+    } catch (e) {
+        console.error('AMap weather fetch failed', e);
+    }
+    return null;
 }

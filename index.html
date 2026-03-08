@@ -41,9 +41,10 @@
             <span class="weather-city" id="weatherCity">...</span>
             <div class="weather-icon" id="weatherIcon"></div>
             <span class="weather-temp" id="weatherTemp">--°</span>
+            <span class="weather-details" id="weatherDetails" style="display: none;"></span>
         </a>
         <div class="settings-wrapper">
-            <span class="settings-label" data-i18n="settingsTitle">Page Settings</span>
+
             <button id="settingsBtn" class="settings-btn" style="position: relative;">
                 <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g stroke-width="0" />
@@ -203,7 +204,7 @@
                 </div>
 
                 <div id="cityInputGroup" class="input-row" style="margin-top: 4px;">
-                    <input type="text" id="cityInput" placeholder="City..." data-i18n="cityPlaceholder">
+                    <input type="text" id="cityInput" placeholder="搜索城市..." data-i18n="cityPlaceholder">
                     <button id="saveCityBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7" />

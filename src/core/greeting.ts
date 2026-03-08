@@ -1,3 +1,5 @@
+const greetingRandomIndex = Math.floor(Math.random() * 5) + 1;
+
 function initGreetingBrand(greetingWrapper: HTMLElement | null): void {
     if (!greetingWrapper) return;
 
@@ -34,9 +36,7 @@ function initGreetingBrand(greetingWrapper: HTMLElement | null): void {
         timeOfDayLabel = 'night';
     }
 
-    const seed = new Date().getMinutes();
-    const randomIndex = (seed % 5) + 1;
-    const translationKey = `${timeKeyPrefix}${randomIndex}`;
+    const translationKey = `${timeKeyPrefix}${greetingRandomIndex}`;
 
     let rawGreeting = '';
     const message = window.getTranslation(translationKey);

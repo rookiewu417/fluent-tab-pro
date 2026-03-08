@@ -274,7 +274,8 @@ function renderWeather(data: WeatherApiResponse | null): void {
         weatherCity,
         weatherTemp,
         weatherIcon,
-        weatherWidget
+        weatherWidget,
+        weatherDetails
     });
 }
 function updateLauncherVisibility(animate = true): void {
@@ -660,11 +661,13 @@ function updateGoogleParams() {
 }
 async function searchCity(): Promise<void> {
     if (!cityInput || !saveCityBtn) return;
-    const query = cityInput.value.trim();
-    if (!query) return;
+    const city = cityInput.value.trim();
+
+    if (!city) return;
+
     saveCityBtn.innerHTML = '...';
     try {
-        const cityData = await fetchCityData(query);
+        const cityData = await fetchCityData(city);
         if (cityData) {
             currentCityData = cityData;
             localStorage.setItem(CITY_KEY, JSON.stringify(currentCityData));
@@ -814,7 +817,6 @@ function applyBrandInterval() {
     initBrand();
     if (brandIntervalStarted) return;
     brandIntervalStarted = true;
-    setInterval(initBrand, 60000);
 }
 
 const PERSISTENT_BACKUP_KEY = 'fluent_persistent_backup_v1';
@@ -1202,6 +1204,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         cityInput,
         searchCity
     });
+
+
 
     /* App Launcher */
     bindLauncherFeature({
