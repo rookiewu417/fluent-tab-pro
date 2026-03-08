@@ -1,7 +1,7 @@
 # Fluent Tab Pro
 
 Fluent Tab Pro 是一个简约、可定制的浏览器新标签页扩展，采用 Fluent Design 设计语言，旨在提供纯净、高效的浏览体验。
-此项目改进于Fluent New Tab(https://github.com/snw-mint/fluent-new-tab)
+此项目改进自Fluent New Tab(https://github.com/snw-mint/fluent-new-tab)
 
 ## ✨ 功能特性
 
