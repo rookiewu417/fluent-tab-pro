@@ -1,88 +1,52 @@
 # Fluent Tab Pro
 
-![Fluent Tab Pro Mockup](repo-assets/mockup.png)
+Fluent Tab Pro 是一个简约、可定制的浏览器新标签页扩展，采用 Fluent Design 设计语言，旨在提供纯净、高效的浏览体验。
+此项目改进于Fluent New Tab(https://github.com/snw-mint/fluent-new-tab)
 
-<p align="center">
-  <strong>A modern new tab inspired by Microsoft's Fluent Design.</strong>
-</p>
+## ✨ 功能特性
 
-<p align="center">
-  <a href="https://github.com/rookiewu417/fluent-tab-pro/releases">Installation</a> •
-  <a href="CONTRIBUTING.md">Contributing</a> •
-  <a href="TRANSLATING.md">Help translate</a>
-</p>
+- **简约设计**：平滑的动画与直观的布局。
+- **动态壁纸**：支持 Bing 每日图片、NASA、维基百科等多种图片源。
+- **自定义配置**：高度可定制的外观与功能。
+- **隐私优先**：无需不必要的权限，数据存储在本地。
+- **快捷搜索**：内置高效的搜索引擎入口。
 
+## 🚀 快速开始
 
-## Why choose Fluent Tab Pro?
+如果你想从源码构建或进行二次开发，请参考以下步骤：
 
-- Minimal, lightweight layout focused on productivity.
-- Built-in launcher for Microsoft 365, Google Workspace, and Proton.
-- Fast search with voice input and optional suggestions.
-- Unlimited shortcuts with automatic high-quality favicons.
-- Adaptive theme: Light, Dark, or System.
-- Privacy-first: no tracking or telemetry.
+### 1. 克隆项目
+```bash
+git clone https://github.com/rookiewu417/fluent-tab-pro.git
+cd fluent-tab-pro
+```
 
-More details on the [GitHub repository.](https://github.com/rookiewu417/fluent-tab-pro)
+### 2. 安装依赖
+```bash
+npm install
+```
 
+### 3. 构建项目
+```bash
+# 执行完整构建
+npm run build
+```
 
-## Installation
+构建产物将保存在 `dist` 目录中。
 
-Download the latest release from GitHub:
+## 🛠️ 构建命令
 
-<a href="https://github.com/rookiewu417/fluent-tab-pro/releases" style="display:inline-block;margin:0 0px;">
-  <img src="repo-assets/download-github.svg" width="200"/>
-</a>
+- `npm run build`: 转换 TypeScript，编译 SCSS 并复制资源。
+- `npm run watch:ts`: 监视并实时编译 TypeScript。
+- `npm run watch:scss`: 监视并实时编译 SCSS。
+- `npm run clean`: 清理构建目录。
 
-### Manual installation
-For the latest version:
-1. Download the latest `.zip` from the Releases Page.
-2. Unzip the file.
-3. Open `edge://extensions` in your browser.
-4. Enable **Developer Mode**.
-5. Click **Load Unpacked** and select the unzipped folder.
+## 📦 安装到浏览器
 
-## Local development (TypeScript + SCSS)
-This project uses a build step.
+1. 打开浏览器扩展管理页面 (`chrome://extensions` 或 `edge://extensions`)。
+2. 开启“开发者模式”。
+3. 点击“加载解压的扩展程序”，选择项目根目录（确保已执行构建命令）。
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Build extension files:
-   ```bash
-   npm run build
-   ```
-3. In `edge://extensions`, click **Load unpacked** and select the `dist/` folder.
+## 📄 开源协议
 
-Source files are in `src/`:
-- `src/script.ts` → `dist/script.js`
-- `src/style.scss` → `dist/style.css`
-
-Runtime files (`script.js` and `style.css`) are generated only in `dist/`.
-
-## Privacy
-
-Fluent Tab Pro follows a local-first approach.
-
-- No analytics or tracking.
-- Settings stored locally (`localStorage`) with optional backup in `chrome.storage.local`.
-- Uploaded wallpapers saved in IndexedDB.
-- External requests only for required features (weather, wallpapers, favicons, optional suggestions).
-
-See the Privacy Policy for details.
-
-## Contributing
-
-Contributions are welcome.
-
-- Translators: read the [Translation Guide](TRANSLATING.md).
-- Developers: read the [Developer Guide](CONTRIBUTING.md).
-
-
-## License and legal notice
-
-GPL-3.0 license (effective 18/02/2026).
-
-Forks/distributions must use a different name and logo, and be clearly marked as forks.
-
-All trademarks belong to their respective owners. No affiliation or endorsement by Microsoft, Google, or Proton AG.
+本项目采用 [GPL-3.0 License](LICENSE) 开源协议。
