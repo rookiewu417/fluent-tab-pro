@@ -682,10 +682,8 @@ async function initWeather() {
     const cachedString = localStorage.getItem(CACHE_KEY);
     if (cachedString) {
         const cached = JSON.parse(cachedString) as WeatherCache;
-        const now = Date.now();
-        if ((now - cached.timestamp < CACHE_DURATION) && (cached.city === currentCityData.name)) {
+        if (cached.city === currentCityData.name) {
             renderWeather(cached.data);
-            return;
         }
     }
     fetchWeatherFromAPI();
